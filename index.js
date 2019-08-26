@@ -45,7 +45,7 @@ async function init() {
     console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", queue);
     channel.consume(queue, function (msg) {
         console.log(" [x] Received %s", msg.content.toString());
-        let possibleVolunteers = Volunteer.pickVolunteer(JSON.parse(msg.content), volunteers);
+        let possibleVolunteers = Volunteer.pickVolunteer(JSON.parse(msg.content), Object.values(volunteers));
         console.log(possibleVolunteers);
     }, {
         noAck: false

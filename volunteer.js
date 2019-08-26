@@ -3,7 +3,8 @@ const basics = ['disc', 'RAM', 'CPU', 'credibility'];
 function pickVolunteer(job, volunteers) {
 
     return volunteers.filter(volunteer => {
-        if (volunteer.status !== 'FREE')
+
+        if (volunteer.state !== 'FREE')
             return false;
 
         if (volunteer.price > job.price)
@@ -13,6 +14,7 @@ function pickVolunteer(job, volunteers) {
             let basic = basics[i];
 
             if (job[basic] && volunteer[basic] < job[basic]) {
+
                 return false;
             }
 
