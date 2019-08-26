@@ -4,6 +4,8 @@ const socket = io('http://localhost:8081');
 
 const request = require('request');
 
+const Volunteer = require('./volunteer');
+
 
 let volunteers = {};
 
@@ -17,7 +19,7 @@ socket.on('event', function (data) {
 
 
 socket.on('update-volunteers', (data) => {
-    console.log(data)
+    console.log(data);
     volunteers = data;
 });
 
@@ -43,6 +45,8 @@ async function init() {
     console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", queue);
     channel.consume(queue, function (msg) {
         console.log(" [x] Received %s", msg.content.toString());
+        let possibleVolunteers = Volunteer.pickVolunteer(JSON.parse(msg.content), volunteers);
+        console.log(possibleVolunteers);
     }, {
         noAck: false
     });
@@ -51,7 +55,7 @@ async function init() {
 
 init();
 
-
+/*
 setInterval(function () {
     for (let key in volunteers) {
         let volunteer = volunteers[key];
@@ -63,3 +67,4 @@ setInterval(function () {
     }
 
 }, 5000);
+*/
