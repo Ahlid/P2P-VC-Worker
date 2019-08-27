@@ -4,8 +4,8 @@ const socket = io('http://localhost:8081');
 
 const Volunteer = require('./volunteer');
 
+const volunteerManager = new Volunteer();
 
-let volunteers = {};
 
 socket.on('connect', function () {
     console.log("connected")
@@ -17,8 +17,8 @@ socket.on('event', function (data) {
 
 
 socket.on('update-volunteers', (data) => {
-    console.log(data);
-    volunteers = data;
+    // console.log(data);
+    volunteerManager.setVolunteerList(data);
 });
 
 
@@ -40,23 +40,18 @@ async function init() {
         durable: false
     });
 
+    volunteerManager.setChannel(channel);
+
     console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", queue);
     channel.consume(queue, async function (msg) {
         console.log(" [x] Received %s", msg.content.toString());
-        let possibleVolunteers = Volunteer.pickVolunteer(JSON.parse(msg.content), Object.values(volunteers));
-        console.log(possibleVolunteers);
-        //todo: no volunteers
-        if (possibleVolunteers.length > 0) {
-            while (possibleVolunteers.length > 0) {
-                let vol = possibleVolunteers.pop();
-                if (await Volunteer.checkVolunteerAck(vol.ip, vol.port)) {
-                    await Volunteer.sendJob();
-                    break;
-                }
-            }
-        }
-        //todo: ack queue
-        //todo: failure handle
+
+        const job = JSON.parse(msg.content);
+        job.msg = msg;
+        volunteerManager.addJob(job);
+
+        //channel.ack(msg);
+
     }, {
         noAck: false
     });
