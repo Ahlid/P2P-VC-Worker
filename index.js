@@ -2,8 +2,6 @@ const amqp = require('amqplib');
 const io = require('socket.io-client');
 const socket = io('http://localhost:8081');
 
-const request = require('request');
-
 const Volunteer = require('./volunteer');
 
 
@@ -43,10 +41,22 @@ async function init() {
     });
 
     console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", queue);
-    channel.consume(queue, function (msg) {
+    channel.consume(queue, async function (msg) {
         console.log(" [x] Received %s", msg.content.toString());
         let possibleVolunteers = Volunteer.pickVolunteer(JSON.parse(msg.content), Object.values(volunteers));
         console.log(possibleVolunteers);
+        //todo: no volunteers
+        if (possibleVolunteers.length > 0) {
+            while (possibleVolunteers.length > 0) {
+                let vol = possibleVolunteers.pop();
+                if (await Volunteer.checkVolunteerAck(vol.ip, vol.port)) {
+                    await Volunteer.sendJob();
+                    break;
+                }
+            }
+        }
+        //todo: ack queue
+        //todo: failure handle
     }, {
         noAck: false
     });
@@ -55,16 +65,3 @@ async function init() {
 
 init();
 
-/*
-setInterval(function () {
-    for (let key in volunteers) {
-        let volunteer = volunteers[key];
-        request('http://' + volunteer.ip + ':' + volunteer.port + '/healthz', function (error, response, body) {
-            console.error('error:', error); // Print the error if one occurred
-            console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-            console.log('body:', body); // Print the HTML for the Google homepage.
-        });
-    }
-
-}, 5000);
-*/

@@ -1,3 +1,5 @@
+const request = require('request-promise-native');
+
 const basics = ['disc', 'RAM', 'CPU', 'credibility'];
 
 function pickVolunteer(job, volunteers) {
@@ -28,7 +30,21 @@ function pickVolunteer(job, volunteers) {
 
 }
 
+async function checkVolunteerAck(ip, port, timeout = 5000) {
+    try {
+        let res = await request('http://' + ip + ':' + port + '/healthz', {timeout})
+        return res.statusCode === 200;
+    } catch (e) {
+        return false;
+    }
+}
+
+async function sendJob(volunteer, job) {
+//todo: send job
+}
 
 module.exports = {
-    pickVolunteer
+    pickVolunteer,
+    checkVolunteerAck,
+    sendJob
 };
