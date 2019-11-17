@@ -1,6 +1,6 @@
 const amqp = require('amqplib');
 const io = require('socket.io-client');
-const socket = io('http://localhost:8081');
+const socket = io('http://localhost:8082');
 
 const Volunteer = require('./volunteer');
 

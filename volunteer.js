@@ -108,7 +108,12 @@ Volunteer.prototype.sendJob = async function (volunteer, job) {
     try {
         await request('http://' + volunteer.ip + ':' + volunteer.port + '/data/upload/' + job.id, {method: 'POST'});
         await request('http://' + volunteer.ip + ':' + volunteer.port + '/code/upload/' + job.id, {method: 'POST'});
-        await request('http://' + volunteer.ip + ':' + volunteer.port + '/run/' + job.id + '/' + job.exec_file, {method: 'POST'});
+        await request('http://' + volunteer.ip + ':' + volunteer.port + '/run/' + job.id + '/' + job.exec_file,
+            {
+                method: 'POST',
+                json: true,
+                body: {partialResultsVars: job.partialResultsVars}
+            });
         return true;
     } catch (e) {
         console.log(e);
