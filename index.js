@@ -30,7 +30,7 @@ socket.on('disconnect', function () {
 async function init() {
 
 
-    const connection = await amqp.connect('amqp://localhost');
+    const connection = await amqp.connect('amqp://guest:ist191062@164.68.125.146:5672');
 
     const queue = 'jobs';
 
